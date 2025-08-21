@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import { MediasoupClient } from "../mediasoup/socketClient";
 
 const SERVER_URL = "http://localhost:4000/mediasoup";
@@ -23,7 +23,7 @@ export default function ConsumerPage() {
         }
     }, []);
 
-    const consumeOne = async (producerId: string) => {
+    const consumeOne = useCallback( async (producerId: string) => {
         if (consumed[producerId]) return;
         try {
             const stream = await client.consume(producerId);
@@ -35,7 +35,7 @@ export default function ConsumerPage() {
         } catch (err: any) {
             console.error(`❌ Consume error for ${producerId}:`, err);
         }
-    };
+    }, [client, consumed]);
 
     useEffect(() => {
         if (startedRef.current) return;
@@ -96,7 +96,6 @@ export default function ConsumerPage() {
             try {
                 videoRef.current.muted = false;
                 await videoRef.current.play();
-                console.log("🔊 Video unmuted by user");
             } catch (err: any) {
                 console.error("❌ Unmute failed:", err.message);
             }
